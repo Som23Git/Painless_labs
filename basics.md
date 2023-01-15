@@ -136,3 +136,214 @@ POST _scripts/painless/_execute
   "result": "[5+0=5, 5+1=6, 5+2=7, 5+3=8, 5+4=9, 5+5=10, 5+6=11, 5+7=12, 5+8=13, 5+9=14]"
 }
 ```
+
+### Subtraction table for an integer y and x.
+```
+POST _scripts/painless/_execute
+{
+  "script":{
+    "lang":"painless",
+    "source":
+    """
+    int x = params.x;
+    int y = params.y;
+    String z = "Hello";
+    ArrayList subTable = [];
+    for(int i = 15; i<y;){
+      subTable.add(x + "-" + i + "=" + (x-i));
+      i = i + 5;
+    }
+    return subTable;
+    """,
+    "params":{
+      "x":100,
+      "y":55
+    }
+  }
+}
+
+# Output
+{
+  "result": "[100-15=85, 100-20=80, 100-25=75, 100-30=70, 100-35=65, 100-40=60, 100-45=55, 100-50=50]"
+}
+```
+
+## Exercise 1
+
+```
+#Input
+"configItems":
+[
+    {
+        "resourceId":"foo0",
+        "type":"bar0"
+    },
+    {
+        "resourceId":"foo1",
+        "type":"bar1"
+    },
+    {
+        "type":"bar2"
+    },
+    {
+        "resourceId":"foo3"
+    }
+]
+
+#Expected output
+
+{
+    "result": "{foo0=bar0, foo1=bar1, Unknown_resource_id=bar3, foo4=Unknown_type}" 
+}
+```
+Write a script for the above input
+```
+#Trial One
+
+POST _scripts/painless/_execute
+{
+    "script":{
+        "lang":"painless",
+        "source":
+        """
+        Map nestedObjectstoList(List nestedObjects){
+          Map entries = new HashMap();
+          for(nestedObject in nestedObjects){
+            entries.put(
+              nestedObject.get("resourceId"),
+              nestedObject.get("type")
+              )
+          }
+          return entries;
+        }
+        return nestedObjectstoList(params.configItems);
+        """,
+        "params":{
+            "configItems":
+            [
+                {
+                    "resourceId":"foo0",
+                    "type":"bar0"
+                },
+                {
+                    "resourceId":"foo1",
+                    "type":"bar1"
+                },
+                {
+                    "type":"bar2"
+                },
+                {
+                    "resourceId":"foo3"
+                }
+            ]
+        }
+    }
+}
+
+# Output for trial 1
+{
+  "result": "{null=bar2, foo0=bar0, foo1=bar1, foo3=null}"
+}
+
+```
+
+```
+# Trial two - adding Default options, if object properties is not available so this replaces the "null"
+
+POST _scripts/painless/_execute
+{
+  "script":{
+    "lang":"painless",
+    "source":
+    """
+      Map nestedObjectstoList(List nestedObjects){
+        Map entries = new HashMap();
+        for(nestedObject in nestedObjects){
+          entries.put(
+          nestedObject.getOrDefault("resourceId","Unknown_Resource"),
+          nestedObject.getOrDefault("type","Unknown_type")
+          )
+        }
+        return entries;
+      }
+      return nestedObjectstoList(params.configItems);
+    """,
+    "params":{
+      "configItems":
+            [
+                {
+                    "resourceId":"foo0",
+                    "type":"bar0"
+                },
+                {
+                    "resourceId":"foo1",
+                    "type":"bar1"
+                },
+                {
+                    "type":"bar2"
+                },
+                {
+                    "resourceId":"foo3"
+                }
+            ]
+    }
+  }
+}
+
+# Output for Trial two 2
+{
+  "result": "{Unknown_Resource=bar2, foo0=bar0, foo1=bar1, foo3=Unknown_type}"
+}
+```
+```
+# Trial three - replacing the resourceId and type as a param i.e. declaring it as keyField and valueField so taking it in the function.
+
+POST _scripts/painless/_execute
+{
+  "script":{
+    "lang":"painless",
+    "source":
+    """
+    Map nestedObjectstoList(List nestedObjects,String keyField,String valueField){
+      Map entries = new HashMap();
+      for(nestedObject in nestedObjects){
+        entries.put(
+          nestedObject.getOrDefault(keyField,"Unknown_Key"),
+          nestedObject.getOrDefault(valueField,"Unknown_value")
+          )
+      }
+      return entries;
+    }
+    return nestedObjectstoList(params.configItems, params.keyField, params.valueField);
+    """,
+    "params":{
+      "keyField":"resourceId",
+      "valueField":"type",
+      "configItems":
+            [
+                {
+                    "resourceId":"foo0",
+                    "type":"bar0"
+                },
+                {
+                    "resourceId":"foo1",
+                    "type":"bar1"
+                },
+                {
+                    "type":"bar2"
+                },
+                {
+                    "resourceId":"foo3"
+                }
+            ]
+    }
+  }
+}
+
+
+# Output for trial three
+{
+  "result": "{Unknown_Key=bar2, foo0=bar0, foo1=bar1, foo3=Unknown_value}"
+}
+
+```
