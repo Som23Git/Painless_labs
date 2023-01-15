@@ -79,6 +79,7 @@ POST _scripts/painless/_execute
 ```
 
 ### Multiplication table for an integer m.
+### Write a script to find the multiplication tables for all positive integers up to m (with each table going up to m*n) and return them in a Map. Continue to use functions to organize and encapsulate your logic.
 
 ```
 POST _scripts/painless/_execute
@@ -347,3 +348,79 @@ POST _scripts/painless/_execute
 }
 
 ```
+
+### Write a script that will test is an input integer n is even or odd. Encapsulate the logic in functions as necessary.
+
+```
+#Basic Trial one
+
+POST _scripts/painless/_execute
+{
+  "script":{
+    "lang":"painless",
+    "source": 
+    """
+      int x = params.n;
+      if((x%2) == 0){
+        return "even"
+      } else
+      {
+        return "odd"
+      }
+    """,
+    "params":{
+      "n":1234
+    }
+  }
+}
+
+# Output
+{
+  "result": "even"
+}
+
+```
+
+
+### Get-loan-quote query and results.
+```
+# Basic Trial one
+
+GET borrowers/_search
+{
+  "_source":false,
+  "fields":[
+    "name",
+    "id",
+    "credit_rating", 
+    "loan_quote.risk_rating",
+    "loan_quote.loan_id",
+    "loan_quote.interest_rate"
+  ],
+  "runtime_mappings":{
+    "loan_quote":{
+      "type": "composite",
+      "script":{
+        "lang": "painless",
+        "source":
+        """
+        if(doc['credit_rating'].value > 500){
+          emit(['risk_rating': 'Poor']);
+        }
+        """
+      },
+        "fields":{
+          "risk_rating":{
+            "type": "keyword"
+          },
+          "loan_id":{
+            "type":"keyword"
+          },
+          "interest_rate":{
+            "type":"double"
+          }
+        }
+      }
+    }
+  }
+  ```
