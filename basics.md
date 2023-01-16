@@ -78,6 +78,32 @@ POST _scripts/painless/_execute
 }
 ```
 
+### Script parameters.
+
+```
+POST _scripts/painless/_execute
+{
+    "script":{
+        "lang":"painless",
+        "source":
+        """
+        String name = params.name;
+        return "The name is " + name + "!";
+        """,
+        "params":{
+            "name": "Som"
+        }
+    }
+}
+
+# Output
+{
+  "result": "The name is Som!"
+}
+```
+
+
+
 ### Multiplication table for an integer m.
 ### Write a script to find the multiplication tables for all positive integers up to m (with each table going up to m*n) and return them in a Map. Continue to use functions to organize and encapsulate your logic.
 
