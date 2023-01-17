@@ -64,4 +64,27 @@ POST _scripts/painless/_execute
 
 Formula: (℃) = (℉ - 32) x 5/9
 
+5/9 = 0.5556
+
+### Write a script to convert from degrees Farenheit to degrees Celsius. Use parameters to pass the degrees Farenheit to the script and encapsulate the formula in a farenheitToCelsius function inside the script.
+
+```
+POST _scripts/painless/_execute
+{
+  "script":{
+    "lang":"painless",
+    "source": 
+        """
+        double farenheitToCelsius(double f) {
+            double c = (f - 32) / 1.8;
+            return c;
+        }
+        return farenheitToCelsius(params.f);
+        """,
+    "params":{
+      "f":"20"
+    }
+  }
+}
+
 
