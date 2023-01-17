@@ -450,3 +450,105 @@ GET borrowers/_search
     }
   }
   ```
+
+
+```
+# Loan Quote problem just testing phase
+
+GET borrowers/_search
+{
+  "_source": false, 
+  "fields": [
+    "loan_quote.loan_id","loan_quote.risk_rating","loan_quote.interest_rate"
+  ],
+  "runtime_mappings": {
+    "loan_quote": {
+      "type": "composite",
+      "script": {
+        "lang": "painless",
+        "source": 
+        """
+        if(doc['credit_rating'].value > params.risk_rating){
+        String loanId = params['_source']['name'] + '-' + params['_source']['id'];
+        emit(['loan_id': loanId]);
+        } else{
+        emit(['risk_rating': 'Bad']);
+        }
+        """,
+        "params": {
+          "risk_rating": 500
+        }
+      },
+      "fields":{
+        "loan_id":{
+          "type": "keyword"
+        },
+        "risk_rating":{
+          "type": "keyword"
+        },
+        "interest_rate":{
+          "type": "double"
+        }
+      }
+    }
+  }
+}
+
+#Important Notes:
+
+doc[''].value -> Is used for keyword fields
+params[''] -> Is used for text field or fields other than keyword type.
+
+
+# Output
+
+ {
+  "took": 16,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": {
+      "value": 3,
+      "relation": "eq"
+    },
+    "max_score": 1,
+    "hits": [
+      {
+        "_index": "borrowers",
+        "_id": "1",
+        "_score": 1,
+        "fields": {
+          "loan_quote.risk_rating": [
+            "Bad"
+          ]
+        }
+      },
+      {
+        "_index": "borrowers",
+        "_id": "2",
+        "_score": 1,
+        "fields": {
+          "loan_quote.loan_id": [
+            "Mary-002"
+          ]
+        }
+      },
+      {
+        "_index": "borrowers",
+        "_id": "4",
+        "_score": 1,
+        "fields": {
+          "loan_quote.risk_rating": [
+            "Bad"
+          ]
+        }
+      }
+    ]
+  }
+}
+```
