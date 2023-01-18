@@ -552,3 +552,62 @@ params[''] -> Is used for text field or fields other than keyword type.
   }
 }
 ```
+
+```
+#Testing the script with the basic params
+POST _scripts/painless/_execute
+{
+  "script":{
+    "lang":"painless",
+    "source":
+    """
+    String loan_id = (params.credit_rating > params.risk_rating)? "True" : "False";
+    double credit_rating = params.credit_rating;
+    return([loan_id, credit_rating]);
+    """,
+    "params":{
+      "risk_rating":500,
+      "good_interest_rate": 1.5,
+      "bad_interest_rate": 2.0,
+      "credit_rating": 400
+    }
+  }
+}
+
+#Output
+{
+  "result": "[False, 400.0]"
+}
+```
+
+```
+# Testing with the Map function loan_quote
+
+POST _scripts/painless/_execute
+{
+  "script":{
+    "lang":"painless",
+    "source":
+    """
+    Map getLoanQuote(int credit_rating, int risk_rating, double good_interest_rate){
+      String result = credit_rating + " Credit Rating!";
+      return (["result":result]);
+    }
+    return getLoanQuote(params.credit_rating, params.risk_rating, params.good_interest_rate);
+ 
+    """,
+    "params":{
+      "risk_rating":500,
+      "good_interest_rate": 1.5,
+      "bad_interest_rate": 2.0,
+      "credit_rating": 400
+    }
+  }
+}
+
+# Output
+{
+  "result": "{result=400 Credit Rating!}"
+}
+
+```
