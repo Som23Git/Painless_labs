@@ -699,3 +699,37 @@ POST _scripts/painless/_execute
   "result": "dlroW olleH"
 }
 ```
+# Find the number of years between the day
+# Important link: https://www.elastic.co/guide/en/elasticsearch/painless/current/painless-datetime.html
+# Strings containing dates in ISO 8601 format can be converted to ZonedDateTime objects in a script.
+
+```
+POST _scripts/painless/_execute
+{
+  "script":{
+    "lang": "painless",
+    "source": 
+    """
+    String datetime = params.x;
+    ZonedDateTime zdt1 = ZonedDateTime.parse(datetime);
+    ZonedDateTime zdt2 = ZonedDateTime.parse(params.y);
+    long zdt3 = ChronoUnit.YEARS.between(zdt1, zdt2);
+    int year1 = zdt1.getYear();
+    int year2 = zdt2.getYear();
+    int resultYear = year2 - year1;
+    return (["parsedX": zdt1,"parsedY": zdt2, "final":zdt3,"year1":year1,"year2":year2,"resultYear":resultYear]);
+    """,
+    "params":{
+      "x": "1983-10-13T22:15:30Z",
+      "y": "2023-10-13T10:15:30Z"
+    }
+  }
+}
+
+# Based on the above, we could use s.getYear() method and find the difference or we can use the complete datetype that will find the difference
+
+# Output
+{
+  "result": "{parsedY=2023-10-13T10:15:30Z, resultYear=40, final=39, parsedX=1983-10-13T22:15:30Z, year1=1983, year2=2023}"
+}
+```
