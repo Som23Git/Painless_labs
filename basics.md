@@ -611,3 +611,91 @@ POST _scripts/painless/_execute
 }
 
 ```
+
+# The area of a regular polygon with n sides of length s can be found using the following formula
+# (s^2 * n)/(4*tan(180deg/n))
+
+```
+
+POST _scripts/painless/_execute
+{
+  "script":{
+    "lang":"painless",
+    "source": 
+    """
+    double calcPolygon(double s, double n){
+      double result = ((s * s * n)/(4 * Math.tan(Math.toRadians(180/n))));
+      return result;
+    }
+    return calcPolygon(params.sides,params.length);
+    """,
+    "params":{
+      "sides": 3,
+      "length": 10
+    }
+  }
+}
+
+# Output
+{
+  "result": "69.2478795864432"
+}
+
+```
+
+# The function that takes a input string "Hello World" and then reverse the string
+# Using replace() method but it's hardcoding which will not work when dynamically ingesting data
+
+```
+POST _scripts/painless/_execute
+{
+  "script":{
+    "lang": "painless",
+    "source": 
+    """
+    String name = "Hello World!";
+    String reverse = name.replace("Hello World","dlroW olleH");
+    return reverse;
+    """,
+    "params":{
+      
+    }
+  }
+}
+
+# Hardcoded Output
+{
+  "result": "dlroW olleH!"
+}
+```
+
+# Dynamically ingested data to reverse string
+
+```
+POST _scripts/painless/_execute
+{
+  "script":{
+    "lang": "painless",
+    "source": 
+    """
+    String reverse(String name){
+    String y = "";
+    int x = name.length();
+    for(int i=x-1; i>=0; i--){
+     y = y + name.charAt(i);
+    }
+    return y;
+    }
+    return reverse(params.name)
+    """,
+    "params":{
+      "name":"Hello World"
+    }
+  }
+}
+
+# Output
+{
+  "result": "dlroW olleH"
+}
+```
