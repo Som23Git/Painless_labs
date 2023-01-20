@@ -733,3 +733,80 @@ POST _scripts/painless/_execute
   "result": "{parsedY=2023-10-13T10:15:30Z, resultYear=40, final=39, parsedX=1983-10-13T22:15:30Z, year1=1983, year2=2023}"
 }
 ```
+
+# Problems: Write a script that will accept a numeric score as a parameter and convert it to a letter grade. Use following scale: 
+# A - (93 - 100), B - (85 - 92), C - (76 - 84), D - (65 - 75), F - (0 - 64)
+# Encapsulate your logic in a toLetterGrade function. Return the answer as a Map with two keys numeric_grade and letter_grade
+
+```
+POST _scripts/painless/_execute
+{
+  "script":{
+    "lang": "painless",
+    "source": 
+    """ 
+    Map toLetterGrade(int x){
+        if(x >= 93){
+          return (["A": x]);
+        }else if(x >= 85 && x < 93){
+          return (["B": x]);
+        } else if(x >= 76 && x <= 84){
+          return (["C": x]);
+        }else if(x >= 65 && x <= 75){
+          return (["D": x]);
+        }else{
+          return (["F": x]);
+        }
+      }
+    return toLetterGrade(params.numericScore);
+    """,
+    "params":{
+      "numericScore": 98,
+      "letterGrade1": "A",
+      "letterGrade2": "B",
+      "letterGrade3": "C",
+      "letterGrade4": "D",
+      "letterGrade5": "F"
+    }
+  }
+}
+
+# Output
+{
+  "result": "{A=98}"
+}
+```
+
+# Randomly create the numeric score and fed that into the toLetterGrade function to generate the letterGrade dynamically
+```
+POST _scripts/painless/_execute
+{
+  "script":{
+    "lang": "painless",
+    "source": 
+    """ 
+        Map toLetterGrade(){
+        double x = Math.ceil(Math.random() * 100);
+        if(x >= 93.0){
+          return (["A": x]);
+        }else if(x >= 85.0 && x < 93.0){
+          return (["B": x]);
+        } else if(x >= 76.0 && x <= 84.0){
+          return (["C": x]);
+        }else if(x >= 65.0 && x <= 75.0){
+          return (["D": x]);
+        }else{
+          return (["F": x]);
+        }
+      }
+    return toLetterGrade();
+    """
+  }
+}
+
+# Output
+{
+  "result": "{B=88.0}"
+}
+
+```
