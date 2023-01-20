@@ -739,6 +739,7 @@ POST _scripts/painless/_execute
 # Encapsulate your logic in a toLetterGrade function. Return the answer as a Map with two keys numeric_grade and letter_grade
 
 ```
+# My version of solution
 POST _scripts/painless/_execute
 {
   "script":{
@@ -777,6 +778,36 @@ POST _scripts/painless/_execute
 }
 ```
 
+```
+# Actual version from Elasticsearch
+POST _scripts/painless/_execute
+{
+    "script": {
+        "lang": "painless",
+        "source": """
+        String toLetterGrade(long g) {
+            if (g < 65) { return "F"; }
+            else if (g < 76) { return "D"; }
+            else if (g < 85) { return "C"; }
+            else if (g < 93) { return "B"; }
+            else { return "A"; }
+        }
+
+        long grade = params.grade;
+        return ["numeric_grade": grade, "letter_grade": toLetterGrade(grade)];
+        """,
+        "params": {
+            "grade": 75
+        }
+    }
+}
+
+# Output
+{
+  "result": "{numeric_grade=75, letter_grade=D}"
+}
+```
+
 # Randomly create the numeric score and fed that into the toLetterGrade function to generate the letterGrade dynamically
 ```
 POST _scripts/painless/_execute
@@ -808,5 +839,4 @@ POST _scripts/painless/_execute
 {
   "result": "{B=88.0}"
 }
-
 ```
