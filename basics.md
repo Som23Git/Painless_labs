@@ -840,3 +840,55 @@ POST _scripts/painless/_execute
   "result": "{B=88.0}"
 }
 ```
+# Calculate or multiply using a powers or exponential variable
+
+```
+POST _scripts/painless/_execute
+{
+  "script":{
+    "lang": "painless",
+    "source": 
+    """
+    return 10 * Math.pow(2,params.n)
+    """,
+    "params":{
+      "n": 1
+    }
+  }
+}
+
+# Output
+{
+  "result": "20.0"
+}
+```
+
+# Use a loop to write a script to raise a number x to a non-negative integer power n. Encapsulate your logic in a power function inside the script.
+# Very important to notice that the ArrayList is different from Array
+```
+POST _scripts/painless/_execute
+{
+  "script":{
+    "lang": "painless",
+    "source": 
+    """
+    ArrayList power(int x){
+      ArrayList y = [];
+      for(int i=1; i< 10;i++){
+        y.add(Math.pow(2*x,i));
+    }
+    return y;
+    }
+    return power(params.n)
+    """,
+    "params":{
+      "n": 1
+    }
+  }
+}
+
+# Output
+{
+  "result": "[2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]"
+}
+```
