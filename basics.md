@@ -892,3 +892,33 @@ POST _scripts/painless/_execute
   "result": "[2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]"
 }
 ```
+
+```
+# The actual version of Elasticsearch
+POST _scripts/painless/_execute
+{
+    "script": {
+        "lang": "painless",
+        "source": """
+        double power(double x, int n) {
+            double y = 1.0;
+            for (int i = 1; i <= n; i++) {
+                y *= x;
+            }
+            return y;
+        }
+
+        return power(params.x, params.n);
+        """,
+        "params": {
+            "x": 3.9,
+            "n": 4
+        }
+    }
+}
+
+# Output
+{
+  "result": "231.34409999999997"
+}
+```
