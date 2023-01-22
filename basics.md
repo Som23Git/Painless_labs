@@ -864,7 +864,7 @@ POST _scripts/painless/_execute
 ```
 
 # Use a loop to write a script to raise a number x to a non-negative integer power n. Encapsulate your logic in a power function inside the script.
-# Very important to notice that the ArrayList is different from Array
+# Very important to notice that the ArrayList is different from Array so used add.method()
 ```
 POST _scripts/painless/_execute
 {
