@@ -922,3 +922,47 @@ POST _scripts/painless/_execute
   "result": "231.34409999999997"
 }
 ```
+
+# Problems: Write a script that will accept a numeric score as a parameter and convert it to a letter grade. Use following scale: 
+# A - (93 - 100), B - (85 - 92), C - (76 - 84), D - (65 - 75), F - (0 - 64)
+# Encapsulate your logic in a toLetterGrade function. Return the answer as a Map with two keys numeric_grade and letter_grade
+
+```
+# My version of solution
+POST _scripts/painless/_execute
+{
+  "script":{
+    "lang": "painless",
+    "source": 
+    """ 
+    Map toLetterGrade(int x){
+        if(x >= 93){
+          return (["A": x]);
+        }else if(x >= 85 && x < 93){
+          return (["B": x]);
+        } else if(x >= 76 && x <= 84){
+          return (["C": x]);
+        }else if(x >= 65 && x <= 75){
+          return (["D": x]);
+        }else{
+          return (["F": x]);
+        }
+      }
+    return toLetterGrade(params.numericScore);
+    """,
+    "params":{
+      "numericScore": 98,
+      "letterGrade1": "A",
+      "letterGrade2": "B",
+      "letterGrade3": "C",
+      "letterGrade4": "D",
+      "letterGrade5": "F"
+    }
+  }
+}
+
+# Output
+{
+  "result": "{A=98}"
+}
+```
