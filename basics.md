@@ -922,3 +922,34 @@ POST _scripts/painless/_execute
   "result": "231.34409999999997"
 }
 ```
+
+# Use a loop to increment the value of n to 100
+
+```
+POST scripts/painless/execute
+{
+  "script":{
+    "lang": "painless",
+    "source":
+    """
+    int incrementValue(int n){
+    for(int i=0;i<n;i++,n++){
+      ArrayList x[i] = n;
+    }
+    return x;
+    }
+    return incrementValue(params.valueN)
+    """,
+    "params":
+    {
+      "valueN": 98;
+    }
+  }
+}
+
+# Output
+{
+  "result": "[98,99,100]"
+}
+
+```
