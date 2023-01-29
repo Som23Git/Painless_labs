@@ -986,3 +986,29 @@ POST _scripts/painless/_execute
 }
 
 ```
+
+# Basic Script for testing
+
+```
+POST _scripts/painless/_execute
+{
+  "script":{
+    "lang":"painless",
+    "source":
+    """
+    int n = params.valueN;
+    int y = params.valueY;
+    return ([n+y]);
+    """,
+    "params":{
+      "valueN":12,
+      "valueY":29
+    }
+  }
+}
+
+#Output
+{
+  "result": "[39]"
+}
+```
