@@ -1007,8 +1007,4 @@ POST _scripts/painless/_execute
   }
 }
 
-#Output
-{
-  "result": "[39]"
-}
 ```
