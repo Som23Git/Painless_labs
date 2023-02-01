@@ -1012,3 +1012,24 @@ POST _scripts/painless/_execute
   "result": "[39]"
 }
 ```
+
+# Conditional Parameter
+
+```
+POST _scripts/painless/_execute
+{
+  "script": {
+    "lang": "painless",
+    "source": """
+      String name = params.name;
+      return "Hello, " + name + ", welcome to Painless programming!"
+    """,
+    "params": {
+      "name": "Maria Smith"
+    }
+  }
+}
+
+# Output
+Hello, Maria Smith, welcome to Painless programming!
+```
