@@ -1031,5 +1031,34 @@ POST _scripts/painless/_execute
 }
 
 # Output
-Hello, Maria Smith, welcome to Painless programming!
+{
+  "result": "Hello, Maria Smith, welcome to Painless programming!"
+}
+
+```
+
+# Conditional Statement
+
+```
+POST _scripts/painless/_execute
+{
+  "script": {
+    "lang": "painless",
+    "source": """
+      int score = params.score;
+      String testResult;
+      testResult = (score >= 60)? "Pass" : "Fail";
+      return testResult;
+    """,
+    "params": {
+      "score": 85
+    }
+  }
+}
+
+# Output
+{
+  "result": "Pass"
+}
+
 ```
