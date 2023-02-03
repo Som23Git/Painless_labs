@@ -1060,5 +1060,4 @@ POST _scripts/painless/_execute
 {
   "result": "Pass"
 }
-
 ```
